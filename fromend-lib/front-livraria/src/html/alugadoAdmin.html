@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Livros Alugados</title>
+  <link href="https://fonts.googleapis.com/css?family=Domine&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css?family=Amiko&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Amiko', sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    h1 {
+      font-family: 'Domine', serif;
+      color: rgba(48,74,67,1);
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+
+    table th, table td {
+      text-align: left;
+      padding: 10px;
+      border: 1px solid #ddd;
+    }
+
+    table th {
+      background-color: rgba(48,74,67,1);
+      color: white;
+    }
+
+    table tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    .btn {
+      background-color: rgba(48,74,67,1);
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      opacity: 0.8;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 20px;
+      color: rgba(48,74,67,1);
+      background-color: rgb(104, 146, 134);
+      padding: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Livros Alugados</h1>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Categoria</th>
+          <th>Status</th>
+          <th>Alugado Por</th>
+        </tr>
+      </thead>
+      <tbody id="bookTableBody">
+        <!-- Livros alugados serão listados aqui -->
+      </tbody>
+    </table>
+  </div>
+
+  <footer>
+    <p>&copy; 2024 Administração - Todos os direitos reservados</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    const apiURL = 'http://localhost:4000/livro';
+    let books = [];
+
+    async function fetchBooks() {
+      try {
+        const response = await axios.get(apiURL);
+        if (response.data.success) {
+          books = response.data.data.filter(book => book.status === 'alugado');
+          displayBooks(books);
+        }
+      } catch (error) {
+        console.error('Erro ao buscar livros:', error);
+      }
+    }
+
+    function displayBooks(books) {
+      const bookTableBody = document.getElementById('bookTableBody');
+      bookTableBody.innerHTML = '';
+
+      books.forEach(book => {
+        const row = `
+          <tr>
+            <td>${book.nome}</td>
+            <td>${book.categoria}</td>
+            <td>${book.status}</td>
+            <td>${book.alugadoPor}</td>
+          </tr>
+        `;
+        bookTableBody.insertAdjacentHTML('beforeend', row);
+      });
+    }
+
+    fetchBooks();
+  </script>
+</body>
+</html>

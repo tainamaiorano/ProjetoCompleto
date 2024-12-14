@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administração de Livros</title>
+  <link href="https://fonts.googleapis.com/css?family=Domine&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css?family=Amiko&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Amiko', sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    h1 {
+      font-family: 'Domine', serif;
+      color: rgba(48,74,67,1);
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+
+    table th, table td {
+      text-align: left;
+      padding: 10px;
+      border: 1px solid #ddd;
+    }
+
+    table th {
+      background-color: rgba(48,74,67,1);
+      color: white;
+    }
+
+    table tr:nth-child(even) {
+      background-color: #f2f2f2;
+    }
+
+    .btn {
+      background-color: rgba(48,74,67,1);
+      color: white;
+      border: none;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .btn-warning {
+      background-color: #ffc107;
+    }
+
+    .btn-danger {
+      background-color: #dc3545;
+    }
+
+    .btn:hover {
+      opacity: 0.8;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 500px;
+    }
+
+    .form-label {
+      font-weight: bold;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 20px;
+      color: rgba(48,74,67,1);
+      background-color: rgb(104, 146, 134);
+      padding: 4px;
+      background-color: rgb(104, 146, 134);
+      padding: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Administração de Livros</h1>
+    <a href="admin.html" class="btn">Usuários</a>
+    <a href="cadastroLivro.html" class="btn">Cadastrar Livro</a>
+    <a href="alugadoAdmin.html" class="btn">Histórico</a>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Categoria</th>
+          <th>Status</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody id="bookTableBody">
+        <!-- Livros serão listados aqui -->
+      </tbody>
+    </table>
+  </div>
+
+  <div class="modal" id="editBookModal">
+    <div class="modal-content">
+      <h5>Editar Livro</h5>
+      <form id="editBookForm">
+        <label for="editBookName" class="form-label">Nome</label>
+        <input type="text" id="editBookName" class="form-control" required>
+
+        <label for="editBookCategory" class="form-label">Categoria</label>
+        <input type="text" id="editBookCategory" class="form-control" required>
+
+        <label for="editBookStatus" class="form-label">Status</label>
+        <select id="editBookStatus" class="form-control" required>
+          <option value="disponivel">Disponível</option>
+          <option value="alugado">Alugado</option>
+        </select>
+
+        <button type="submit" class="btn">Salvar</button>
+      </form>
+    </div>
+  </div>
+
+  <footer>
+    <p>&copy; 2024 Administração - Todos os direitos reservados</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    const apiURL = 'http://localhost:4000/livro';
+    let books = [];
+    let editingBookId = null;
+
+    async function fetchBooks() {
+      try {
+        const response = await axios.get(apiURL);
+        if (response.data.success) {
+          books = response.data.data;
+          displayBooks(books);
+        }
+      } catch (error) {
+        console.error('Erro ao buscar livros:', error);
+      }
+    }
+
+    function displayBooks(books) {
+      const bookTableBody = document.getElementById('bookTableBody');
+      bookTableBody.innerHTML = '';
+
+      books.forEach(book => {
+        const row = `
+          <tr>
+            <td>${book.nome}</td>
+            <td>${book.categoria}</td>
+            <td>${book.status}</td>
+            <td>
+              <button class="btn btn-warning" onclick="editBook('${book._id}')">Editar</button>
+              <button class="btn btn-danger" onclick="deleteBook('${book._id}')">Excluir</button>
+            </td>
+          </tr>
+        `;
+        bookTableBody.insertAdjacentHTML('beforeend', row);
+      });
+    }
+
+    function editBook(bookId) {
+      const book = books.find(b => b._id === bookId);
+      if (book) {
+        editingBookId = bookId;
+        document.getElementById('editBookName').value = book.nome;
+        document.getElementById('editBookCategory').value = book.categoria;
+        document.getElementById('editBookStatus').value = book.status;
+        document.getElementById('editBookModal').style.display = 'flex';
+      }
+    }
+
+    document.getElementById('editBookForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const updatedBook = {
+        nome: document.getElementById('editBookName').value,
+        categoria: document.getElementById('editBookCategory').value,
+        status: document.getElementById('editBookStatus').value,
+      };
+
+      try {
+        await axios.put(`${apiURL}/${editingBookId}`, updatedBook);
+        alert('Livro atualizado com sucesso!');
+        fetchBooks();
+        document.getElementById('editBookModal').style.display = 'none';
+      } catch (error) {
+        console.error('Erro ao atualizar livro:', error);
+        alert('Erro ao atualizar livro.');
+      }
+    });
+
+    async function deleteBook(bookId) {
+      if (confirm('Tem certeza que deseja excluir este livro?')) {
+        try {
+          await axios.delete(`${apiURL}/${bookId}`);
+          alert('Livro excluído com sucesso!');
+          fetchBooks();
+        } catch (error) {
+          console.error('Erro ao excluir livro:', error);
+          alert('Erro ao excluir livro.');
+        }
+      }
+    }
+
+    fetchBooks();
+  </script>
+</body>
+</html>

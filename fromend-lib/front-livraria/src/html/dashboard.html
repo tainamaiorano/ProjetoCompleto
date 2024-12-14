@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Livros Disponíveis</title>
+  <link href="https://fonts.googleapis.com/css?family=Domine&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css?family=Amiko&display=swap" rel="stylesheet" />
+  <style>
+    body {
+      font-family: 'Amiko', sans-serif;
+      background-color: #f5f5f5;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    h1 {
+      font-family: 'Domine', serif;
+      color: rgba(48,74,67,1);
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .header .logo img {
+      max-width: 100px;
+    }
+
+    .header .title h1 {
+      font-size: 24px;
+      color: rgba(48,74,67,1);
+    }
+
+    .header .search {
+      display: flex;
+      align-items: center;
+    }
+
+    .header .search input {
+      border: 1px solid #ccc;
+      padding: 8px 12px;
+      border-radius: 4px;
+    }
+
+    .categories {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 30px;
+      gap: 15px;
+    }
+
+    .categories .category {
+      text-decoration: none;
+      padding: 10px 20px;
+      background-color: rgba(48,74,67,1);
+      color: white;
+      border-radius: 4px;
+      transition: background-color 0.3s;
+    }
+
+    .categories .category:hover {
+      background-color: darkgreen;
+    }
+
+    .filters {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .filters input,
+    .filters select {
+      width: 48%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .book-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+    }
+
+    .book-item {
+      display: flex;
+      flex-direction: column;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      overflow: hidden;
+      max-width: 300px;
+      background-color: white;
+      transition: transform 0.3s;
+    }
+
+    .book-item img {
+      max-width: 100%;
+      height: auto;
+      border-bottom: 1px solid #ccc;
+    }
+
+    .book-details {
+      padding: 15px;
+      text-align: center;
+    }
+
+    .book-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: rgba(48,74,67,1);
+    }
+
+    .book-status {
+      font-size: 14px;
+      color: #777;
+      margin-top: 10px;
+    }
+
+    .book-item:hover {
+      transform: scale(1.05);
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 40px;
+      color: rgba(48,74,67,1);
+      background-color: rgb(104, 146, 134);
+      padding: 4px;
+    }
+
+    .btn {
+      background-color: rgba(48,74,67,1);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background-color: darkgreen;
+    }
+  </style>
+</head>
+<body>
+  <div  class="container">
+    <div style="padding: 4px; background-color: rgba(48,74,67,1);" class="header">
+      <div class="logo">
+        <img src="./images/v15_137.png" alt="Logo da Biblioteca">
+      </div>
+        <h1 style="color: white;">Biblioteca</h1>
+      <div class="search">
+      </div>
+    </div>
+
+    <nav class="categories">
+      <a href="historico.html" class="category">Histórico</a>
+    </nav>
+
+    <div class="filters">
+      <input type="text" id="searchInput" placeholder="Pesquisar por nome">
+      <select id="categorySelect">
+        <option value="">Todas as categorias</option>
+      </select>
+    </div>
+
+    <div class="book-grid" id="booksContainer">
+      <!-- Livros serão carregados aqui -->
+    </div>
+
+    <footer class="footer">
+      <p>&copy; 2024 Biblioteca - Todos os direitos reservados</p>
+    </footer>
+  </div>
+
+  <!-- Axios JS -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script>
+    const apiURL = 'http://localhost:4000/livro';
+    let booksData = [];
+
+    async function fetchBooks() {
+      try {
+        const response = await axios.get(apiURL);
+        if (response.data.success) {
+          booksData = response.data.data;
+          populateCategoryFilter(booksData);
+          displayBooks(booksData);
+        }
+      } catch (error) {
+        console.error('Erro ao buscar os livros:', error);
+      }
+    }
+
+    function displayBooks(books) {
+      const booksContainer = document.getElementById('booksContainer');
+      booksContainer.innerHTML = '';
+
+      books.forEach(book => {
+        const bookCard = `
+          <div class="book-item">
+            <img src="${book.imagem}" alt="${book.nome}">
+            <div class="book-details">
+              <p class="book-title">${book.nome}</p>
+              <p class="book-status">${book.status}</p>
+              <button class="btn" onclick="redirectToDetails('${book._id}')">Saber Mais</button>
+            </div>
+          </div>
+        `;
+        booksContainer.insertAdjacentHTML('beforeend', bookCard);
+      });
+    }
+
+    function populateCategoryFilter(books) {
+      const categorySelect = document.getElementById('categorySelect');
+      const categories = [...new Set(books.map(book => book.categoria))];
+
+      categories.forEach(category => {
+        const option = `<option value="${category}">${category}</option>`;
+        categorySelect.insertAdjacentHTML('beforeend', option);
+      });
+    }
+
+    function filterBooks() {
+      const searchInput = document.getElementById('searchInput').value.toLowerCase();
+      const selectedCategory = document.getElementById('categorySelect').value;
+
+      const filteredBooks = booksData.filter(book => {
+        const matchesName = book.nome.toLowerCase().includes(searchInput);
+        const matchesCategory = selectedCategory ? book.categoria === selectedCategory : true;
+        return matchesName && matchesCategory;
+      });
+
+      displayBooks(filteredBooks);
+    }
+
+    document.getElementById('searchInput').addEventListener('input', filterBooks);
+    document.getElementById('categorySelect').addEventListener('change', filterBooks);
+
+    function redirectToDetails(bookId) {
+      window.location.href = `details.html?id=${bookId}`;
+    }
+
+    fetchBooks();
+  </script>
+</body>
+</html>
