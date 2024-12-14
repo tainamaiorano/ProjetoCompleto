@@ -3,16 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Importação de fontes externas para estilização -->
     <link href="https://fonts.googleapis.com/css?family=Domine&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css?family=Amiko&display=swap" rel="stylesheet" />
+    <!-- Link para o CSS local -->
     <link href="./css/main.css" rel="stylesheet" />
     <title>Login - Biblioteca</title>
-    <!-- Bootstrap CSS -->
+    <!-- Inclusão do Bootstrap para facilitar o design responsivo -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        /* Estilos para o corpo da página, incluindo fonte e aspectos gerais */
         body {
             font-family: 'Domine', serif;
         }
+        /* Estilo do contêiner do login, incluindo borda e sombra */
         .login-container {
             max-width: 400px;
             margin: 50px auto;
@@ -22,15 +26,18 @@
             background-color: #f8f9fa;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
+        /* Título da página de login */
         .login-title {
             font-size: 24px;
             color: rgba(48,74,67,1);
             text-align: center;
             margin-bottom: 20px;
         }
+        /* Estilo para os labels dos campos de entrada */
         .form-group label {
             color: #495057;
         }
+        /* Estilo para os campos de entrada de texto e senha */
         .form-group input {
             width: 100%;
             padding: 10px;
@@ -38,6 +45,7 @@
             border: 1px solid #ced4da;
             border-radius: 4px;
         }
+        /* Estilo para o botão de login */
         .btn-primary {
             background-color: rgba(48,74,67,1);
             border-color: rgba(48,74,67,1);
@@ -46,10 +54,12 @@
             padding: 10px;
             border-radius: 4px;
         }
+        /* Efeito de hover para o botão de login */
         .btn-primary:hover {
             background-color: rgba(48,74,67,1);
             border-color: rgba(48,74,67,1);
         }
+        /* Estilo do link para cadastro de novo usuário */
         .register-link {
             display: block;
             text-align: center;
@@ -57,10 +67,12 @@
             color: rgba(48,74,67,1);
             text-decoration: none;
         }
+        /* Efeito de hover no link de cadastro */
         .register-link:hover {
             color: rgba(48,74,67,1);
             text-decoration: underline;
         }
+        /* Estilo do botão de fechar */
         .close-btn {
             position: absolute;
             top: 10px;
@@ -71,9 +83,11 @@
             color: #dc3545;
             cursor: pointer;
         }
+        /* Efeito de hover para o botão de fechar */
         .close-btn:hover {
             color: #a71d2a;
         }
+        /* Estilo da mensagem de erro */
         #errorMessage {
             display: none;
             color: #dc3545;
@@ -83,64 +97,74 @@
     </style>
 </head>
 <body class="login-page">
+    <!-- Contêiner principal do formulário de login -->
     <div class="login-container">
+        <!-- Botão para fechar a janela de login (não funcional no código) -->
         <button class="close-btn" aria-label="Fechar">&times;</button>
         <h1 class="login-title">Login</h1>
+        <!-- Formulário de login -->
         <form id="loginForm">
+            <!-- Campo para o login -->
             <div class="form-group">
                 <label for="login">Login</label>
                 <input type="text" id="login" placeholder="Digite seu login" required>
             </div>
+            <!-- Campo para a senha -->
             <div class="form-group">
                 <label for="senha">Senha</label>
                 <input type="password" id="senha" placeholder="Digite sua senha" required>
             </div>
+            <!-- Div para mostrar a mensagem de erro, inicialmente oculta -->
             <div id="errorMessage">Credenciais inválidas.</div>
+            <!-- Botão para enviar o formulário -->
             <button type="submit" class="btn btn-primary">Entrar</button>
+            <!-- Link para a página de cadastro de novos usuários -->
             <a href="cadastroUsuario.html" class="register-link">Cadastre-se aqui</a>
         </form>
     </div>
 
-    <!-- Axios JS -->
+    <!-- Inclusão do Axios para requisições HTTP -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
-        // Função para salvar o nome na sessão
+        // Função para salvar o nome do usuário na sessão
         function salvarSessao(nome) {
             sessionStorage.setItem('usuario', nome);
         }
 
-        // Manipulação do formulário de login
+        // Manipulação do envio do formulário de login
         const form = document.getElementById('loginForm');
         form.addEventListener('submit', async (event) => {
-            event.preventDefault();
+            event.preventDefault(); // Previne o envio padrão do formulário
 
             const login = document.getElementById('login').value;
             const senha = document.getElementById('senha').value;
             const errorMessage = document.getElementById('errorMessage');
 
+            // Verificação de login padrão (admin)
             if (login === 'adm' && senha === 'adm') {
-                window.location.href = 'admin.html';
+                window.location.href = 'admin.html'; // Redireciona para a página de administração
             } else {
                 try {
-                    // Fazer a requisição para a API
+                    // Requisição para a API para verificar se o usuário existe
                     const response = await axios.get('http://localhost:4000/usuario');
 
                     if (response.data.success) {
                         const usuarios = response.data.data;
 
-                        // Verificar se o login e senha existem
+                        // Verifica se o login e senha fornecidos coincidem com algum usuário
                         const usuario = usuarios.find(u => u.login === login && u.senha === senha);
 
                         if (usuario) {
-                            // Salvar o nome na sessão e redirecionar
+                            // Salva o nome do usuário na sessão e redireciona para o dashboard
                             salvarSessao(usuario.nome);
                             window.location.href = 'dashboard.html';
                         } else {
-                            // Exibir mensagem de erro
+                            // Exibe a mensagem de erro se não encontrar o usuário
                             errorMessage.style.display = 'block';
                         }
                     }
                 } catch (error) {
+                    // Caso ocorra erro ao acessar a API
                     console.error('Erro ao consultar a API:', error);
                     errorMessage.textContent = 'Erro ao conectar-se ao servidor.';
                     errorMessage.style.display = 'block';

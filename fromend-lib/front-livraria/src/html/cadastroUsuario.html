@@ -7,59 +7,75 @@
     <link href="https://fonts.googleapis.com/css?family=Amiko&display=swap" rel="stylesheet" />
     <link href="./css/main.css" rel="stylesheet" />
     <title>Cadastro de Usuário</title>
-    <!-- Bootstrap CSS -->
+    <!-- Bootstrap CSS para estilos responsivos e prontos para uso -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        /* Estilos gerais do corpo da página */
         body {
             font-family: 'Domine', serif;
-            background-color: #f8f9fa;
+            background-color: #f8f9fa; /* Cor de fundo clara */
         }
+
+        /* Estilizando o container do formulário de cadastro */
         .register-container {
             max-width: 500px;
             margin: 50px auto;
             padding: 20px;
             border: 2px solid rgba(48, 74, 67, 1);
             border-radius: 8px;
-            background-color: #fff;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            background-color: #fff; /* Fundo branco para o formulário */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra para dar profundidade */
         }
+
+        /* Estilo para o título do formulário */
         .register-title {
             font-size: 24px;
             color: rgba(48, 74, 67, 1);
             text-align: center;
             margin-bottom: 20px;
         }
+
+        /* Estilos para os campos de entrada (inputs) do formulário */
         .form-group label {
-            color: #495057;
+            color: #495057; /* Cor dos rótulos */
         }
+
         .form-group input, .form-group select {
-            width: 100%;
+            width: 100%; /* Faz os campos ocuparem toda a largura disponível */
             padding: 10px;
             margin-top: 5px;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
+            border: 1px solid #ced4da; /* Borda suave para os campos */
+            border-radius: 4px; /* Borda arredondada */
         }
+
+        /* Estilizando o botão de cadastro */
         .btn-primary {
-            background-color: rgba(48, 74, 67, 1);
-            border-color: rgba(48, 74, 67, 1);
-            color: #fff;
-            width: 100%;
+            background-color: rgba(48, 74, 67, 1); /* Cor de fundo do botão */
+            border-color: rgba(48, 74, 67, 1); /* Cor da borda do botão */
+            color: #fff; /* Cor do texto no botão */
+            width: 100%; /* Faz o botão ocupar toda a largura do formulário */
             padding: 10px;
             border-radius: 4px;
         }
+
+        /* Estilo para o botão ao passar o mouse */
         .btn-primary:hover {
-            background-color: #1e5a50;
-            border-color: #184e46;
+            background-color: #1e5a50; /* Cor de fundo mais escura no hover */
+            border-color: #184e46; /* Cor da borda no hover */
         }
+
+        /* Estilos para a mensagem de sucesso */
         .success-message {
             display: none;
-            color: #28a745;
+            color: #28a745; /* Cor verde para mensagens de sucesso */
             text-align: center;
             margin-top: 10px;
         }
+
+        /* Estilos para a mensagem de erro */
         .error-message {
             display: none;
-            color: #dc3545;
+            color: #dc3545; /* Cor vermelha para mensagens de erro */
             text-align: center;
             margin-top: 10px;
         }
@@ -67,20 +83,30 @@
 </head>
 <body>
     <div class="register-container">
+        <!-- Título do formulário -->
         <h1 class="register-title">Cadastro de Usuário</h1>
+
+        <!-- Formulário de cadastro de usuário -->
         <form id="registerForm">
+            <!-- Campo para o nome completo -->
             <div class="form-group">
                 <label for="nome">Nome Completo</label>
                 <input type="text" id="nome" placeholder="Digite seu nome completo" required>
             </div>
+
+            <!-- Campo para o login -->
             <div class="form-group">
                 <label for="login">Login</label>
                 <input type="text" id="login" placeholder="Digite seu login" required>
             </div>
+
+            <!-- Campo para a senha -->
             <div class="form-group">
                 <label for="senha">Senha</label>
                 <input type="password" id="senha" placeholder="Digite sua senha" required>
             </div>
+
+            <!-- Campo para escolher o status do usuário (ativo ou inativo) -->
             <div class="form-group">
                 <label for="ativo">Ativo</label>
                 <select id="ativo" required>
@@ -88,42 +114,53 @@
                     <option value="false">Inativo</option>
                 </select>
             </div>
+
+            <!-- Mensagens de erro e sucesso -->
             <div class="error-message" id="errorMessage">Erro ao cadastrar. Tente novamente.</div>
             <div class="success-message" id="successMessage">Usuário cadastrado com sucesso!</div>
+
+            <!-- Botão para submeter o formulário -->
             <button type="submit" class="btn btn-primary">Cadastrar</button>
         </form>
     </div>
 
-    <!-- Axios JS -->
+    <!-- Inclusão da biblioteca Axios para fazer requisições HTTP -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
+        // Função para enviar o formulário de cadastro
         document.getElementById('registerForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
+            e.preventDefault(); // Evita o comportamento padrão de recarregar a página
 
+            // Coleta os dados do formulário
             const nome = document.getElementById('nome').value;
             const login = document.getElementById('login').value;
             const senha = document.getElementById('senha').value;
-            const ativo = document.getElementById('ativo').value === 'true';
+            const ativo = document.getElementById('ativo').value === 'true'; // Converte para booleano
 
+            // Cria o objeto com os dados do usuário
             const userData = { nome, login, senha, ativo };
             const errorMessage = document.getElementById('errorMessage');
             const successMessage = document.getElementById('successMessage');
 
             try {
+                // Envia os dados para o servidor usando a API
                 const response = await axios.post('http://localhost:4000/usuario', userData);
 
+                // Verifica se o cadastro foi bem-sucedido
                 if (response.data.success) {
+                    // Exibe a mensagem de sucesso e oculta a de erro
                     successMessage.style.display = 'block';
                     errorMessage.style.display = 'none';
-                    document.getElementById('registerForm').reset();
+                    document.getElementById('registerForm').reset(); // Limpa o formulário após o envio
                 } else {
+                    // Exibe a mensagem de erro e oculta a de sucesso
                     successMessage.style.display = 'none';
                     errorMessage.style.display = 'block';
                 }
             } catch (error) {
-                console.error('Erro ao enviar dados:', error);
-                successMessage.style.display = 'none';
-                errorMessage.style.display = 'block';
+                console.error('Erro ao enviar dados:', error); // Exibe o erro no console
+                successMessage.style.display = 'none'; // Oculta a mensagem de sucesso
+                errorMessage.style.display = 'block'; // Exibe a mensagem de erro
             }
         });
     </script>

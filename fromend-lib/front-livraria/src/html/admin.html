@@ -1,122 +1,44 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Título da página -->
   <title>Administração de Usuários</title>
-  <link href="https://fonts.googleapis.com/css?family=Domine&display=swap" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css?family=Amiko&display=swap" rel="stylesheet" />
+
+  <!-- Estilos principais da página -->
   <style>
+    /* Definindo a fonte, cor de fundo e estrutura básica da página */
     body {
       font-family: 'Amiko', sans-serif;
       background-color: #f5f5f5;
-      margin: 0;
-      padding: 0;
     }
 
-    .container {
-      max-width: 1200px;
-      margin: auto;
-      padding: 20px;
-    }
-
-    h1 {
-      font-family: 'Domine', serif;
-      color: rgba(48,74,67,1);
-      text-align: center;
-      margin-bottom: 30px;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 20px;
-    }
-
-    table th, table td {
-      text-align: left;
-      padding: 10px;
-      border: 1px solid #ddd;
-    }
-
+    /* Estilo da tabela que exibe os usuários */
     table th {
       background-color: rgba(48,74,67,1);
       color: white;
     }
 
-    table tr:nth-child(even) {
-      background-color: #f2f2f2;
-    }
-
+    /* Botões com diferentes estilos, incluindo o de editar e excluir */
     .btn {
       background-color: rgba(48,74,67,1);
       color: white;
-      border: none;
-      padding: 8px 12px;
-      border-radius: 4px;
-      cursor: pointer;
     }
-
     .btn-warning {
-      background-color: #ffc107;
+      background-color: #ffc107; /* Botão de edição */
     }
-
     .btn-danger {
-      background-color: #dc3545;
-    }
-
-    .btn:hover {
-      opacity: 0.8;
-    }
-
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.5);
-      justify-content: center;
-      align-items: center;
-    }
-
-    .modal-content {
-      background-color: white;
-      padding: 20px;
-      border-radius: 8px;
-      width: 90%;
-      max-width: 500px;
-    }
-
-    .form-label {
-      font-weight: bold;
-    }
-
-    .form-control {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 10px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-
-    footer {
-      text-align: center;
-      margin-top: 20px;
-      color: rgba(48,74,67,1);
-      background-color: rgb(104, 146, 134);
-      padding: 4px;
+      background-color: #dc3545; /* Botão de exclusão */
     }
   </style>
 </head>
 <body>
+  <!-- Contêiner principal -->
   <div class="container">
     <h1>Administração de Usuários</h1>
+    
+    <!-- Botões de navegação para outras páginas -->
     <a href="livroadmin.html" class="btn">Livros</a>
     <a href="cadastroLivro.html" class="btn">Cadastrar Livro</a>
     <a href="alugadoAdmin.html" class="btn">Histórico</a>
 
+    <!-- Tabela de usuários -->
     <table>
       <thead>
         <tr>
@@ -127,54 +49,61 @@
         </tr>
       </thead>
       <tbody id="userTableBody">
-        <!-- Usuários serão listados aqui -->
+        <!-- Usuários serão listados aqui via JavaScript -->
       </tbody>
     </table>
   </div>
 
+  <!-- Modal para editar usuários -->
   <div class="modal" id="editUserModal">
     <div class="modal-content">
       <h5>Editar Usuário</h5>
+      <!-- Formulário de edição do usuário -->
       <form id="editUserForm">
         <label for="editUserName" class="form-label">Nome</label>
         <input type="text" id="editUserName" class="form-control" required>
-        
+
         <label for="editUserLogin" class="form-label">Login</label>
         <input type="text" id="editUserLogin" class="form-control" required>
-        
+
         <label for="editUserStatus" class="form-label">Status</label>
         <select id="editUserStatus" class="form-control" required>
           <option value="true">Ativo</option>
           <option value="false">Inativo</option>
         </select>
-        
+
         <button type="submit" class="btn">Salvar</button>
       </form>
     </div>
   </div>
 
+  <!-- Rodapé da página -->
   <footer>
     <p>&copy; 2024 Administração - Todos os direitos reservados</p>
   </footer>
 
+  <!-- Inclusão do Axios para requisições HTTP -->
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script>
+    // URL da API para manipulação de usuários
     const apiURL = 'http://localhost:4000/usuario';
-    let users = [];
-    let editingUserId = null;
+    let users = []; // Lista de usuários
+    let editingUserId = null; // ID do usuário sendo editado
 
+    // Função para buscar os usuários da API
     async function fetchUsers() {
       try {
-        const response = await axios.get(apiURL);
+        const response = await axios.get(apiURL); // Requisição GET
         if (response.data.success) {
           users = response.data.data;
-          displayUsers(users);
+          displayUsers(users); // Atualiza a tabela de usuários
         }
       } catch (error) {
         console.error('Erro ao buscar usuários:', error);
       }
     }
 
+    // Função para exibir os usuários na tabela
     function displayUsers(users) {
       const userTableBody = document.getElementById('userTableBody');
       userTableBody.innerHTML = '';
@@ -190,10 +119,11 @@
             </td>
           </tr>
         `;
-        userTableBody.insertAdjacentHTML('beforeend', row);
+        userTableBody.insertAdjacentHTML('beforeend', row); // Preenche a tabela
       });
     }
 
+    // Função para abrir o modal de edição de um usuário
     function editUser(userId) {
       const user = users.find(u => u._id === userId);
       if (user) {
@@ -201,12 +131,13 @@
         document.getElementById('editUserName').value = user.nome;
         document.getElementById('editUserLogin').value = user.login;
         document.getElementById('editUserStatus').value = user.ativo;
-        document.getElementById('editUserModal').style.display = 'flex';
+        document.getElementById('editUserModal').style.display = 'flex'; // Exibe o modal
       }
     }
 
+    // Evento de submissão do formulário de edição
     document.getElementById('editUserForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
+      e.preventDefault(); // Previne o comportamento padrão do formulário
       const updatedUser = {
         nome: document.getElementById('editUserName').value,
         login: document.getElementById('editUserLogin').value,
@@ -214,30 +145,31 @@
       };
 
       try {
-        await axios.put(`${apiURL}/${editingUserId}`, updatedUser);
+        await axios.put(`${apiURL}/${editingUserId}`, updatedUser); // Requisição PUT para atualizar o usuário
         alert('Usuário atualizado com sucesso!');
-        fetchUsers();
-        document.getElementById('editUserModal').style.display = 'none';
+        fetchUsers(); // Recarrega a lista de usuários
+        document.getElementById('editUserModal').style.display = 'none'; // Fecha o modal
       } catch (error) {
         console.error('Erro ao atualizar usuário:', error);
         alert('Erro ao atualizar usuário.');
       }
     });
 
+    // Função para excluir um usuário
     async function deleteUser(userId) {
-      if (confirm('Tem certeza que deseja excluir este usuário?')) {
+      if (confirm('Tem certeza que deseja excluir este usuário?')) { // Confirmação antes de excluir
         try {
-          await axios.delete(`${apiURL}/${userId}`);
+          await axios.delete(`${apiURL}/${userId}`); // Requisição DELETE para excluir o usuário
           alert('Usuário excluído com sucesso!');
-          fetchUsers();
+          fetchUsers(); // Recarrega a lista de usuários
         } catch (error) {
           console.error('Erro ao excluir usuário:', error);
-          alert('Erro ao excluir usuário.');
+          alert('Erro ao excluir usuária.');
         }
       }
     }
 
-    fetchUsers();
+    fetchUsers(); // Chama a função para buscar os usuários ao carregar a página
   </script>
 </body>
 </html>

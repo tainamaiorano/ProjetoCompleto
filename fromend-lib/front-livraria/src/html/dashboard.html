@@ -4,9 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Livros Disponíveis</title>
+  <!-- Importando fontes externas do Google Fonts -->
   <link href="https://fonts.googleapis.com/css?family=Domine&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css?family=Amiko&display=swap" rel="stylesheet" />
   <style>
+    /* Definindo o estilo do corpo da página */
     body {
       font-family: 'Amiko', sans-serif;
       background-color: #f5f5f5;
@@ -27,6 +29,7 @@
       margin-bottom: 30px;
     }
 
+    /* Estilizando o cabeçalho da página */
     .header {
       display: flex;
       justify-content: space-between;
@@ -34,10 +37,12 @@
       margin-bottom: 20px;
     }
 
+    /* Ajustes na logo do cabeçalho */
     .header .logo img {
       max-width: 100px;
     }
 
+    /* Estilizando o título principal */
     .header .title h1 {
       font-size: 24px;
       color: rgba(48,74,67,1);
@@ -48,12 +53,14 @@
       align-items: center;
     }
 
+    /* Estilizando a caixa de busca */
     .header .search input {
       border: 1px solid #ccc;
       padding: 8px 12px;
       border-radius: 4px;
     }
 
+    /* Estilos para os links de categorias */
     .categories {
       display: flex;
       justify-content: center;
@@ -70,16 +77,19 @@
       transition: background-color 0.3s;
     }
 
+    /* Efeito de hover nas categorias */
     .categories .category:hover {
       background-color: darkgreen;
     }
 
+    /* Estilos dos filtros de pesquisa */
     .filters {
       display: flex;
       justify-content: space-between;
       margin-bottom: 20px;
     }
 
+    /* Estilizando a caixa de busca e o filtro de categoria */
     .filters input,
     .filters select {
       width: 48%;
@@ -88,6 +98,7 @@
       border-radius: 4px;
     }
 
+    /* Estilos para a grid de livros */
     .book-grid {
       display: flex;
       flex-wrap: wrap;
@@ -95,6 +106,7 @@
       justify-content: center;
     }
 
+    /* Estilos para cada item de livro */
     .book-item {
       display: flex;
       flex-direction: column;
@@ -106,17 +118,20 @@
       transition: transform 0.3s;
     }
 
+    /* Imagem do livro */
     .book-item img {
       max-width: 100%;
       height: auto;
       border-bottom: 1px solid #ccc;
     }
 
+    /* Estilizando os detalhes do livro */
     .book-details {
       padding: 15px;
       text-align: center;
     }
 
+    /* Estilos para o título e o status do livro */
     .book-title {
       font-size: 18px;
       font-weight: bold;
@@ -129,10 +144,12 @@
       margin-top: 10px;
     }
 
+    /* Efeito de zoom ao passar o mouse sobre o item */
     .book-item:hover {
       transform: scale(1.05);
     }
 
+    /* Estilo do rodapé da página */
     .footer {
       text-align: center;
       margin-top: 40px;
@@ -141,6 +158,7 @@
       padding: 4px;
     }
 
+    /* Estilos para o botão de detalhes */
     .btn {
       background-color: rgba(48,74,67,1);
       color: white;
@@ -150,65 +168,79 @@
       cursor: pointer;
     }
 
+    /* Efeito de hover no botão */
     .btn:hover {
       background-color: darkgreen;
     }
   </style>
 </head>
 <body>
-  <div  class="container">
-    <div style="padding: 4px; background-color: rgba(48,74,67,1);" class="header">
+  <div class="container">
+    <!-- Cabeçalho com logo e título da página -->
+    <div class="header" style="padding: 4px; background-color: rgba(48,74,67,1);">
       <div class="logo">
         <img src="./images/v15_137.png" alt="Logo da Biblioteca">
       </div>
-        <h1 style="color: white;">Biblioteca</h1>
+      <h1 style="color: white;">Biblioteca</h1>
       <div class="search">
+        <!-- Campo de busca pode ser adicionado aqui -->
       </div>
     </div>
 
+    <!-- Navegação de categorias -->
     <nav class="categories">
       <a href="historico.html" class="category">Histórico</a>
     </nav>
 
+    <!-- Filtros de pesquisa -->
     <div class="filters">
+      <!-- Caixa de pesquisa por nome -->
       <input type="text" id="searchInput" placeholder="Pesquisar por nome">
+      <!-- Filtro por categoria -->
       <select id="categorySelect">
         <option value="">Todas as categorias</option>
       </select>
     </div>
 
+    <!-- Container para os livros que serão carregados -->
     <div class="book-grid" id="booksContainer">
       <!-- Livros serão carregados aqui -->
     </div>
 
+    <!-- Rodapé -->
     <footer class="footer">
       <p>&copy; 2024 Biblioteca - Todos os direitos reservados</p>
     </footer>
   </div>
 
-  <!-- Axios JS -->
+  <!-- Carregando o Axios para requisições HTTP -->
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
   <script>
+    // URL da API que fornece os livros
     const apiURL = 'http://localhost:4000/livro';
     let booksData = [];
 
+    // Função para buscar os livros da API
     async function fetchBooks() {
       try {
+        // Fazendo a requisição GET para a API
         const response = await axios.get(apiURL);
         if (response.data.success) {
           booksData = response.data.data;
-          populateCategoryFilter(booksData);
-          displayBooks(booksData);
+          populateCategoryFilter(booksData); // Populando o filtro de categorias
+          displayBooks(booksData); // Exibindo os livros
         }
       } catch (error) {
         console.error('Erro ao buscar os livros:', error);
       }
     }
 
+    // Função para exibir os livros na página
     function displayBooks(books) {
       const booksContainer = document.getElementById('booksContainer');
-      booksContainer.innerHTML = '';
+      booksContainer.innerHTML = ''; // Limpa o conteúdo anterior
 
+      // Criando e exibindo cada item de livro
       books.forEach(book => {
         const bookCard = `
           <div class="book-item">
@@ -224,37 +256,34 @@
       });
     }
 
+    // Função para popular o filtro de categorias
     function populateCategoryFilter(books) {
       const categorySelect = document.getElementById('categorySelect');
-      const categories = [...new Set(books.map(book => book.categoria))];
+      const categories = [...new Set(books.map(book => book.categoria))]; // Obtendo categorias únicas
 
+      // Adicionando as categorias ao filtro
       categories.forEach(category => {
         const option = `<option value="${category}">${category}</option>`;
         categorySelect.insertAdjacentHTML('beforeend', option);
       });
     }
 
+    // Função para filtrar os livros com base no nome e na categoria
     function filterBooks() {
       const searchInput = document.getElementById('searchInput').value.toLowerCase();
       const selectedCategory = document.getElementById('categorySelect').value;
 
       const filteredBooks = booksData.filter(book => {
-        const matchesName = book.nome.toLowerCase().includes(searchInput);
-        const matchesCategory = selectedCategory ? book.categoria === selectedCategory : true;
-        return matchesName && matchesCategory;
+        const matchesName = book.nome.toLowerCase().includes(searchInput); // Verificando o nome
+        const matchesCategory = selectedCategory ? book.categoria === selectedCategory : true; // Verificando a categoria
+        return matchesName && matchesCategory; // Retornando os livros que correspondem aos critérios
       });
 
-      displayBooks(filteredBooks);
+      displayBooks(filteredBooks); // Exibindo os livros filtrados
     }
 
+    // Adicionando eventos para filtrar os livros quando o usuário digitar ou mudar a categoria
     document.getElementById('searchInput').addEventListener('input', filterBooks);
     document.getElementById('categorySelect').addEventListener('change', filterBooks);
 
-    function redirectToDetails(bookId) {
-      window.location.href = `details.html?id=${bookId}`;
-    }
-
-    fetchBooks();
-  </script>
-</body>
-</html>
+    // Função

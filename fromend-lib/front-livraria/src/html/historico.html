@@ -1,70 +1,98 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Histórico de Aluguéis</title>
+  <meta charset="UTF-8"> <!-- Define o tipo de codificação de caracteres para UTF-8 -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Configura a viewport para responsividade em dispositivos móveis -->
+  <title>Histórico de Aluguéis</title> <!-- Título da página -->
+
+  <!-- Link para o arquivo CSS do Bootstrap para adicionar estilos prontos à página -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
   <div class="container mt-5">
+    <!-- Título da página -->
     <h1 class="text-center mb-4">Histórico de Aluguéis</h1>
 
-    <!-- Lista de Livros -->
+    <!-- Container onde a lista de livros alugados será exibida -->
     <div id="historyContainer" class="row">
-      <!-- Livros alugados aparecerão aqui -->
+      <!-- Os livros alugados serão adicionados aqui -->
     </div>
   </div>
 
+  <!-- Script para carregar a biblioteca Axios, que será usada para fazer requisições HTTP -->
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  
   <script>
+    // URL da API onde os livros estão armazenados
     const apiURL = 'http://localhost:4000/livro';
-    const username = sessionStorage.getItem('usuario'); // Nome do usuário salvo na sessão
 
+    // Obtém o nome do usuário logado da sessão
+    const username = sessionStorage.getItem('usuario'); 
+
+    // Função assíncrona que busca os livros alugados pelo usuário
     async function fetchRentedBooks() {
       try {
+        // Faz uma requisição GET para obter todos os livros
         const response = await axios.get(apiURL);
+
+        // Verifica se a requisição foi bem-sucedida
         if (response.data.success) {
+          // Obtém os dados dos livros da resposta
           const books = response.data.data;
 
-          // Filtrar apenas os livros alugados pelo usuário atual
+          // Filtra os livros alugados pelo usuário atual
           const rentedBooks = books.filter(book => book.alugadoPor === username);
 
+          // Exibe o histórico de aluguéis do usuário
           displayHistory(rentedBooks);
         }
       } catch (error) {
+        // Exibe uma mensagem de erro no console se a requisição falhar
         console.error('Erro ao buscar o histórico:', error);
       }
     }
 
+    // Função que exibe os livros alugados pelo usuário no formato de cartões
     function displayHistory(books) {
       const historyContainer = document.getElementById('historyContainer');
+
+      // Limpa o conteúdo do container antes de adicionar novos itens
       historyContainer.innerHTML = '';
 
+      // Verifica se o usuário não tem livros alugados
       if (books.length === 0) {
+        // Exibe uma mensagem informando que não há livros alugados
         historyContainer.innerHTML = `<p class="text-center text-muted">Nenhum livro alugado.</p>`;
         return;
       }
 
+      // Para cada livro alugado, cria um cartão com suas informações
       books.forEach(book => {
         const bookCard = `
           <div class="col-md-4 mb-4">
+            <!-- Card do livro -->
             <div class="card h-100">
+              <!-- Imagem do livro -->
               <img src="${book.imagem}" class="card-img-top" alt="${book.nome}">
               <div class="card-body">
+                <!-- Título do livro -->
                 <h5 class="card-title">${book.nome}</h5>
+                <!-- Descrição do livro -->
                 <p class="card-text">${book.descricao}</p>
+                <!-- Categoria do livro -->
                 <p class="text-muted">Categoria: ${book.categoria}</p>
+                <!-- Status do livro -->
                 <p class="text-muted">Status: ${book.status}</p>
               </div>
             </div>
           </div>
         `;
+        // Adiciona o cartão ao container de histórico
         historyContainer.insertAdjacentHTML('beforeend', bookCard);
       });
     }
 
-    // Chamar a função para buscar e exibir o histórico
+    // Chama a função para buscar e exibir o histórico de livros alugados
     fetchRentedBooks();
   </script>
 </body>
